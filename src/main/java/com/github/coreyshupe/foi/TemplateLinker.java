@@ -17,6 +17,11 @@ public class TemplateLinker {
         this.rawTemplates = new HashMap<>();
     }
 
+    public <T> void implementTemplates(Class<T> clazz, Template<T> template) {
+        addTemplate(template);
+        addCollectionTemplate(new CollectionTemplate<>(clazz, template, ArrayList::new));
+    }
+
     @NotNull
     private Optional<Template<?>> getTemplate0(@NotNull Set<Template<?>> templateSet, @NotNull Class<?> type) {
         return templateSet.stream().filter(template -> template.isThis(type)).findFirst();
