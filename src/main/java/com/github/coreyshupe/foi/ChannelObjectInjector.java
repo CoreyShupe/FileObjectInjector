@@ -89,7 +89,6 @@ public class ChannelObjectInjector {
     }
 
     public <T> boolean writeObject(@NotNull WritableByteChannel channel, @NotNull T object) throws IOException {
-        // people shouldn't use this really, but it's available if they want to or are sure
         //noinspection unchecked
         Optional<Template<T>> optionalTemplate = templateLinker.getTemplate(object).map(template -> (Template<T>) template);
         if (optionalTemplate.isPresent()) {
