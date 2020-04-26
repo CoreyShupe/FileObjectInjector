@@ -21,39 +21,39 @@ public class FileObjectInjector implements AutoCloseable {
     // reading
 
     public byte read() throws IOException {
-        return readObject(Byte.class).orElseThrow(UnreachableException::new);
+        return read(Byte.class).orElseThrow(UnreachableException::new);
     }
 
     public char readChar() throws IOException {
-        return readObject(Character.class).orElseThrow(UnreachableException::new);
+        return read(Character.class).orElseThrow(UnreachableException::new);
     }
 
     public double readDouble() throws IOException {
-        return readObject(Double.class).orElseThrow(UnreachableException::new);
+        return read(Double.class).orElseThrow(UnreachableException::new);
     }
 
     public float readFloat() throws IOException {
-        return readObject(Float.class).orElseThrow(UnreachableException::new);
+        return read(Float.class).orElseThrow(UnreachableException::new);
     }
 
     public int readInt() throws IOException {
-        return readObject(Integer.class).orElseThrow(UnreachableException::new);
+        return read(Integer.class).orElseThrow(UnreachableException::new);
     }
 
     public long readLong() throws IOException {
-        return readObject(Long.class).orElseThrow(UnreachableException::new);
+        return read(Long.class).orElseThrow(UnreachableException::new);
     }
 
     public short readShort() throws IOException {
-        return readObject(Short.class).orElseThrow(UnreachableException::new);
+        return read(Short.class).orElseThrow(UnreachableException::new);
     }
 
     @NotNull public String readString() throws IOException {
-        return readObject(String.class).orElseThrow(UnreachableException::new);
+        return read(String.class).orElseThrow(UnreachableException::new);
     }
 
     @NotNull public UUID readUUID() throws IOException {
-        return readObject(UUID.class).orElseThrow(UnreachableException::new);
+        return read(UUID.class).orElseThrow(UnreachableException::new);
     }
 
     @NotNull public Collection<Byte> readByteCollection() throws IOException {
@@ -92,7 +92,7 @@ public class FileObjectInjector implements AutoCloseable {
         return readCollection(UUID.class).orElseThrow(UnreachableException::new);
     }
 
-    @NotNull public <T> Optional<T> readObject(@NotNull Class<T> clazz) throws IOException {
+    @NotNull public <T> Optional<T> read(@NotNull Class<T> clazz) throws IOException {
         ensureOpen();
         return injector.readObject(channel, clazz);
     }
@@ -102,7 +102,7 @@ public class FileObjectInjector implements AutoCloseable {
         return injector.readCollection(channel, clazz);
     }
 
-    @NotNull public <T> T readObject(@NotNull Template<T> template) throws IOException {
+    @NotNull public <T> T read(@NotNull Template<T> template) throws IOException {
         ensureOpen();
         return injector.readObject(channel, template);
     }
@@ -110,39 +110,31 @@ public class FileObjectInjector implements AutoCloseable {
     // writing
 
     public boolean writeByte(byte b) throws IOException {
-        return writeObject(Byte.class, b);
+        return write(Byte.class, b);
     }
 
     public boolean writeChar(char c) throws IOException {
-        return writeObject(Character.class, c);
+        return write(Character.class, c);
     }
 
     public boolean writeDouble(double d) throws IOException {
-        return writeObject(Double.class, d);
+        return write(Double.class, d);
     }
 
     public boolean writeFloat(float f) throws IOException {
-        return writeObject(Float.class, f);
+        return write(Float.class, f);
     }
 
     public boolean writeInt(int i) throws IOException {
-        return writeObject(Integer.class, i);
+        return write(Integer.class, i);
     }
 
     public boolean writeLong(long l) throws IOException {
-        return writeObject(Long.class, l);
+        return write(Long.class, l);
     }
 
     public boolean writeShort(short s) throws IOException {
-        return writeObject(Short.class, s);
-    }
-
-    public boolean writeString(@NotNull String string) throws IOException {
-        return writeObject(String.class, string);
-    }
-
-    public boolean writeUUID(@NotNull UUID id) throws IOException {
-        return writeObject(UUID.class, id);
+        return write(Short.class, s);
     }
 
     public boolean writeByteCollection(@NotNull Collection<Byte> b) throws IOException {
@@ -181,11 +173,11 @@ public class FileObjectInjector implements AutoCloseable {
         return writeCollection(UUID.class, uuid);
     }
 
-    public <T> boolean writeObject(@NotNull T object) throws IOException {
+    public <T> boolean write(@NotNull T object) throws IOException {
         return injector.writeObject(channel, object);
     }
 
-    public <T> boolean writeObject(@NotNull Class<T> clazz, @NotNull T object) throws IOException {
+    public <T> boolean write(@NotNull Class<T> clazz, @NotNull T object) throws IOException {
         ensureOpen();
         return injector.writeObject(channel, clazz, object);
     }
@@ -195,7 +187,7 @@ public class FileObjectInjector implements AutoCloseable {
         return injector.writeCollection(channel, clazz, collection);
     }
 
-    public <T> void writeObject(@NotNull Template<T> template, @NotNull T object) throws IOException {
+    public <T> void write(@NotNull Template<T> template, @NotNull T object) throws IOException {
         ensureOpen();
         injector.writeObject(channel, template, object);
     }

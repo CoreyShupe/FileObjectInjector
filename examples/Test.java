@@ -32,12 +32,12 @@ public class Test {
             try (FileObjectInjector injector = new FileObjectInjector(objectInjector, stream.getChannel())) {
 
                 injector.writeInt(123);
-                injector.writeString("Test String");
+                injector.write("Test String");
                 injector.writeChar('c');
                 injector.writeLong(100_321_123L);
-                injector.writeObject(object);
+                injector.write(object);
                 injector.writeStringCollection(stringList);
-                injector.writeUUID(id);
+                injector.write(id);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -52,7 +52,7 @@ public class Test {
                 System.out.println(injector.readString());
                 System.out.println(injector.readChar());
                 System.out.println(injector.readLong());
-                System.out.println(injector.readObject(ExampleObject.class).orElse(null));
+                System.out.println(injector.read(ExampleObject.class).orElse(null));
                 System.out.println(Arrays.toString(injector.readStringCollection().toArray(new String[]{})));
                 System.out.println(injector.readUUID());
 
