@@ -98,5 +98,15 @@ public class SimpleTemplateGenerator<T> {
             //noinspection unchecked
             return (Collection<T>) objectLinkedList.poll();
         }
+
+        public <T> T resolveItem() {
+            //noinspection unchecked
+            return (T) objectLinkedList.poll();
+        }
+
+        public <T> Collection<T> resolveCollection() {
+            //noinspection unchecked
+            return (Collection<T>) objectLinkedList.poll();
+        }
     }
 }
