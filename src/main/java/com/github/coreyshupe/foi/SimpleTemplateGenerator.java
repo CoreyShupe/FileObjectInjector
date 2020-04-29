@@ -82,7 +82,7 @@ public class SimpleTemplateGenerator<T> {
         }
     }
 
-    private static class Resolver {
+    public static class Resolver {
         private final LinkedList<Object> objectLinkedList;
 
         private Resolver() {
