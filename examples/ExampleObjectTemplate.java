@@ -15,7 +15,7 @@ public class ExampleObjectTemplate extends Template<ExampleObject> {
     private final LongTemplate longTemplate = LongTemplate.getInstance();
 
     @Override public boolean isThis(@NotNull Class<?> givenType) {
-        return givenType.isAssignableFrom(ExampleObject.class);
+        return ExampleObject.class.isAssignableFrom(givenType);
     }
 
     @Override public int sizeOf(@NotNull ExampleObject object) {

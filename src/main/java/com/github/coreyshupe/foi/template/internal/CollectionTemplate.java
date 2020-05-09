@@ -22,7 +22,7 @@ public class CollectionTemplate<T> extends Template<Collection<T>> {
     }
 
     @Override public boolean isThis(@NotNull Class<?> givenType) {
-        return givenType.isAssignableFrom(internalClass);
+        return internalClass.isAssignableFrom(givenType);
     }
 
     @Override public int sizeOf(@NotNull Collection<T> object) {

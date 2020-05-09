@@ -65,18 +65,14 @@ public class ChannelObjectInjector {
     @NotNull
     public <T> T readObject(@NotNull ReadableByteChannel channel, @NotNull Template<T> template) throws IOException {
         TemplateWalker walker = new TemplateWalker() {
-            private ByteBuffer buffer = null;
+            private ByteBuffer buffer = ByteBuffer.allocate(1024);
 
             @Override public @NotNull ByteBuffer readSizeOf(int size) throws IOException {
-                if (buffer == null) {
-                    buffer = ByteBuffer.allocate(size);
-                    channel.read(buffer);
-                    buffer.flip();
-                    return buffer;
-                }
                 if (buffer.capacity() >= size) {
-                    buffer.clear();
-                    buffer.limit(size);
+                    if (buffer.position() != 0) {
+                        buffer.flip();
+                        buffer.limit(size);
+                    }
                 } else {
                     buffer = ByteBuffer.allocate(size);
                 }

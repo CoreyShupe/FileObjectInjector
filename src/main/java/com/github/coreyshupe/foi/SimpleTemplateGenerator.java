@@ -37,7 +37,7 @@ public class SimpleTemplateGenerator<T> {
             private final LinkedList<TemplatePart<T, ?>> templateParts = new LinkedList<>(SimpleTemplateGenerator.this.templateParts);
 
             @Override public boolean isThis(@NotNull Class<?> givenType) {
-                return givenType.isAssignableFrom(clazz);
+                return clazz.isAssignableFrom(givenType);
             }
 
             @Override public int sizeOf(@NotNull T object) {
