@@ -3,6 +3,7 @@ package com.github.coreyshupe.foi.template;
 import com.github.coreyshupe.foi.ObjectInjector;
 import com.github.coreyshupe.foi.TemplateLinker;
 import com.github.coreyshupe.foi.TemplateWalker;
+import com.github.coreyshupe.foi.template.internal.CollectionTemplate;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -35,6 +36,16 @@ import java.util.function.Function;
         }
     }
 
+    public <X> boolean addCollection(@NotNull Class<X> type, @NotNull Function<T, Collection<X>> getter) {
+        Optional<CollectionTemplate<X>> optionalTemplate = linker.getCollectionTemplate(type);
+        if (optionalTemplate.isPresent()) {
+            itemInfoList.add(new CollectionItemInfo<>(type, optionalTemplate.get(), getter));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Override public boolean isThis(@NotNull Class<?> givenType) {
         return type.isAssignableFrom(givenType);
     }
@@ -50,7 +61,11 @@ import java.util.function.Function;
     @NotNull @Override public T readFromWalker(@NotNull TemplateWalker walker) throws IOException {
         ResolvedItems items = new ResolvedItems();
         for (ItemInfo<?> item : itemInfoList) {
-            items.insertItem(item.type, item.readFromWalker(walker));
+            if (item.isCollection()) {
+                items.insertCollection(item.type, item.readFromWalker(walker));
+            } else {
+                items.insertItem(item.type, item.readFromWalker(walker));
+            }
         }
         return readObject(items);
     }
@@ -58,11 +73,11 @@ import java.util.function.Function;
     @NotNull public abstract T readObject(ResolvedItems items);
 
     private class ItemInfo<X> {
-        @NotNull private final Class<X> type;
+        @NotNull private final Class<?> type;
         @NotNull private final Template<X> template;
         @NotNull private final Function<T, X> getter;
 
-        private ItemInfo(@NotNull Class<X> type, @NotNull Template<X> template, @NotNull Function<T, X> getter) {
+        private ItemInfo(@NotNull Class<?> type, @NotNull Template<X> template, @NotNull Function<T, X> getter) {
             this.type = type;
             this.template = template;
             this.getter = getter;
@@ -79,13 +94,25 @@ import java.util.function.Function;
         public void writeToBuffer(@NotNull T object, @NotNull ByteBuffer buffer) {
             template.writeToBuffer(getter.apply(object), buffer);
         }
+
+        public boolean isCollection() {
+            return this instanceof CollectionItemInfo;
+        }
+    }
+
+    private class CollectionItemInfo<X> extends ItemInfo<Collection<X>> {
+        private CollectionItemInfo(@NotNull Class<X> type, @NotNull CollectionTemplate<X> template, @NotNull Function<T, Collection<X>> getter) {
+            super(type, template, getter);
+        }
     }
 
     public static class ResolvedItems {
         @NotNull private final Map<Class<?>, List<Object>> objectMap;
+        @NotNull private final Map<Class<?>, List<Object>> collectionMap;
 
         public ResolvedItems() {
             objectMap = new HashMap<>();
+            collectionMap = new HashMap<>();
         }
 
         private void insertItem(@NotNull Class<?> type, @NotNull Object object) {
@@ -95,9 +122,21 @@ import java.util.function.Function;
             objectMap.get(type).add(object);
         }
 
+        private void insertCollection(@NotNull Class<?> type, @NotNull Object collection) {
+            if (!collectionMap.containsKey(type)) {
+                collectionMap.put(type, new ArrayList<>());
+            }
+            collectionMap.get(type).add(collection);
+        }
+
         @NotNull public <T> T getItem(@NotNull Class<T> type, int index) {
             //noinspection unchecked
             return (T) objectMap.get(type).get(index);
+        }
+
+        @NotNull public <T> Collection<T> getCollection(@NotNull Class<T> type, int index) {
+            //noinspection unchecked
+            return (Collection<T>) objectMap.get(type).get(index);
         }
     }
 }
