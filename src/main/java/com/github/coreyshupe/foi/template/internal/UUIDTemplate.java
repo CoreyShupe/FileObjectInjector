@@ -1,6 +1,5 @@
 package com.github.coreyshupe.foi.template.internal;
 
-import com.github.coreyshupe.foi.TemplateLinker;
 import com.github.coreyshupe.foi.template.SizedTemplate;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -18,8 +17,7 @@ public class UUIDTemplate extends SizedTemplate<UUID> {
         super(UUID.class, Long.BYTES * 2);
     }
 
-    @Override
-    public void writeToBuffer(@NotNull TemplateLinker linker, @NotNull UUID object, @NotNull ByteBuffer buffer) {
+    @Override public void writeToBuffer(@NotNull UUID object, @NotNull ByteBuffer buffer) {
         buffer.putLong(object.getMostSignificantBits());
         buffer.putLong(object.getLeastSignificantBits());
     }

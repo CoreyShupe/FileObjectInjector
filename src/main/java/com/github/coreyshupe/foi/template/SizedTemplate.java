@@ -1,6 +1,5 @@
 package com.github.coreyshupe.foi.template;
 
-import com.github.coreyshupe.foi.TemplateLinker;
 import com.github.coreyshupe.foi.TemplateWalker;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -20,8 +19,7 @@ public abstract class SizedTemplate<T> extends ExactTemplate<T> {
         return size;
     }
 
-    @Override
-    public @NotNull T readFromWalker(@NotNull TemplateLinker linker, @NotNull TemplateWalker walker) throws IOException {
+    @Override public @NotNull T readFromWalker(@NotNull TemplateWalker walker) throws IOException {
         return read(walker.readSizeOf(getSize()));
     }
 

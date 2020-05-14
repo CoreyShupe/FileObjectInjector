@@ -1,6 +1,5 @@
 package com.github.coreyshupe.foi.template.internal.primitive;
 
-import com.github.coreyshupe.foi.TemplateLinker;
 import com.github.coreyshupe.foi.template.SizedTemplate;
 import com.github.coreyshupe.foi.template.internal.CollectionTemplate;
 import lombok.Getter;
@@ -22,8 +21,7 @@ public class CharTemplate extends SizedTemplate<Character> {
         return super.isThis(givenType) || givenType == char.class;
     }
 
-    @Override
-    public void writeToBuffer(@NotNull TemplateLinker linker, @NotNull Character object, @NotNull ByteBuffer buffer) {
+    @Override public void writeToBuffer(@NotNull Character object, @NotNull ByteBuffer buffer) {
         buffer.putChar(object);
     }
 

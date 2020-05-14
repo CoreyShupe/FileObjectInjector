@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FileObjectInjector implements AutoCloseable {
+@SuppressWarnings("unused") public class FileObjectInjector implements AutoCloseable {
     @NotNull private final ObjectInjector injector;
     @Nullable private final FileOutputStream outputStream;
     @Nullable private final FileInputStream inputStream;

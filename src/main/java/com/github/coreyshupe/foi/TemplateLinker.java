@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class TemplateLinker {
+@SuppressWarnings({"unused", "UnusedReturnValue"}) public class TemplateLinker {
     @NotNull private final Set<Template<?>> templates;
     @NotNull private final Set<Template<?>> collectionTemplates;
     @NotNull private final Map<String, Set<Template<?>>> rawTemplates;

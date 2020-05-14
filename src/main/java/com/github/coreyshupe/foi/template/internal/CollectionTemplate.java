@@ -1,8 +1,7 @@
 package com.github.coreyshupe.foi.template.internal;
 
-import com.github.coreyshupe.foi.template.Template;
-import com.github.coreyshupe.foi.TemplateLinker;
 import com.github.coreyshupe.foi.TemplateWalker;
+import com.github.coreyshupe.foi.template.Template;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -29,18 +28,16 @@ public class CollectionTemplate<T> extends Template<Collection<T>> {
         return object.stream().map(internalTemplate::sizeOf).reduce(0, Integer::sum) + Integer.BYTES;
     }
 
-    @Override
-    public void writeToBuffer(@NotNull TemplateLinker linker, @NotNull Collection<T> object, @NotNull ByteBuffer buffer) {
+    @Override public void writeToBuffer(@NotNull Collection<T> object, @NotNull ByteBuffer buffer) {
         buffer.putInt(object.size());
-        object.forEach(t -> internalTemplate.writeToBuffer(linker, t, buffer));
+        object.forEach(t -> internalTemplate.writeToBuffer(t, buffer));
     }
 
-    @NotNull @Override
-    public Collection<T> readFromWalker(@NotNull TemplateLinker linker, @NotNull TemplateWalker walker) throws IOException {
+    @NotNull @Override public Collection<T> readFromWalker(@NotNull TemplateWalker walker) throws IOException {
         int size = walker.readSizeOf(Integer.BYTES).getInt();
         Collection<T> newCollection = newCollSupplier.get();
         for (int i = 0; i < size; i++) {
-            newCollection.add(internalTemplate.readFromWalker(linker, walker));
+            newCollection.add(internalTemplate.readFromWalker(walker));
         }
         return newCollection;
     }

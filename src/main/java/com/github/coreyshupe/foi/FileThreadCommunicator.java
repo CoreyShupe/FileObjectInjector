@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.coreyshupe.foi.FileThreadQueue.EMPTY;
 
-public class FileThreadCommunicator {
+@SuppressWarnings("unused") public class FileThreadCommunicator {
     private final AtomicInteger inQueue;
     private boolean closed;
     private volatile boolean stalled;

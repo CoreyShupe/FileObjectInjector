@@ -1,6 +1,5 @@
 package com.github.coreyshupe.foi.template.internal;
 
-import com.github.coreyshupe.foi.TemplateLinker;
 import com.github.coreyshupe.foi.TemplateWalker;
 import com.github.coreyshupe.foi.template.ExactTemplate;
 import lombok.Getter;
@@ -23,14 +22,12 @@ public class StringTemplate extends ExactTemplate<String> {
         return object.getBytes().length + Integer.BYTES;
     }
 
-    @Override
-    public void writeToBuffer(@NotNull TemplateLinker linker, @NotNull String object, @NotNull ByteBuffer buffer) {
+    @Override public void writeToBuffer(@NotNull String object, @NotNull ByteBuffer buffer) {
         buffer.putInt(object.getBytes().length);
         buffer.put(object.getBytes());
     }
 
-    @NotNull @Override
-    public String readFromWalker(@NotNull TemplateLinker linker, @NotNull TemplateWalker walker) throws IOException {
+    @NotNull @Override public String readFromWalker(@NotNull TemplateWalker walker) throws IOException {
         int size = walker.readSizeOf(Integer.BYTES).getInt();
         byte[] bytes = new byte[size];
         walker.readSizeOf(Byte.BYTES * size).get(bytes);

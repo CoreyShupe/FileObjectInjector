@@ -55,7 +55,7 @@ public class FileThreadQueue extends Thread {
         @Builder.Default @NotNull private final Runnable callback = EMPTY;
         @Builder.Default private final boolean debug = false;
 
-        public static FileRequest wrapCallback(final FileRequest fileRequest, final Runnable callback) {
+        public static FileRequest wrapCallback(@NotNull final FileRequest fileRequest, @NotNull final Runnable callback) {
             if (fileRequest.callback == EMPTY) {
                 return FileRequest.builder()
                         .file(fileRequest.file)

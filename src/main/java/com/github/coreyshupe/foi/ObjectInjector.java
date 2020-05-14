@@ -87,7 +87,7 @@ public class ObjectInjector {
                 return buffer;
             }
         };
-        return template.readFromWalker(templateLinker, walker);
+        return template.readFromWalker(walker);
     }
 
     public <T> boolean writeObject(@NotNull WritableByteChannel channel, @NotNull T object) throws IOException {
@@ -123,7 +123,7 @@ public class ObjectInjector {
 
     public <T> void writeObject(@NotNull WritableByteChannel channel, @NotNull Template<T> template, @NotNull T object) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(template.sizeOf(object));
-        template.writeToBuffer(templateLinker, object, buffer);
+        template.writeToBuffer(object, buffer);
         buffer.flip();
         channel.write(buffer);
     }
