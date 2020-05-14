@@ -15,10 +15,16 @@ import java.nio.channels.WritableByteChannel;
 import java.util.Collection;
 import java.util.Optional;
 
-public class ChannelObjectInjector {
+public class ObjectInjector {
+    @NotNull @Getter private final static ObjectInjector defaultInstance = new ObjectInjector();
+
+    public static TemplateLinker getDefaultLinker() {
+        return defaultInstance.templateLinker;
+    }
+
     @NotNull @Getter private final TemplateLinker templateLinker;
 
-    public ChannelObjectInjector() {
+    public ObjectInjector() {
         this.templateLinker = new TemplateLinker();
         // string & primitives
         this.templateLinker.addTemplate(ByteTemplate.getInstance());

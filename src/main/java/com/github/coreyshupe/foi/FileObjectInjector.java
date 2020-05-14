@@ -2,7 +2,11 @@ package com.github.coreyshupe.foi;
 
 import com.github.coreyshupe.foi.template.Template;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.Collection;
@@ -10,12 +14,23 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileObjectInjector implements AutoCloseable {
-    private final ChannelObjectInjector injector;
-    private final FileChannel channel;
+    @NotNull private final ObjectInjector injector;
+    @Nullable private final FileOutputStream outputStream;
+    @Nullable private final FileInputStream inputStream;
+    @NotNull private final FileChannel channel;
 
-    public FileObjectInjector(ChannelObjectInjector injector, FileChannel channel) {
+    public FileObjectInjector(@NotNull ObjectInjector injector, @NotNull FileOutputStream outputStream) {
         this.injector = injector;
-        this.channel = channel;
+        this.outputStream = outputStream;
+        this.inputStream = null;
+        this.channel = outputStream.getChannel();
+    }
+
+    public FileObjectInjector(@NotNull ObjectInjector injector, @NotNull FileInputStream inputStream) {
+        this.injector = injector;
+        this.outputStream = null;
+        this.inputStream = inputStream;
+        this.channel = inputStream.getChannel();
     }
 
     // reading
@@ -195,12 +210,38 @@ public class FileObjectInjector implements AutoCloseable {
     // channel management
 
     public void ensureOpen() {
-        if (channel == null || !channel.isOpen()) {
+        if (!channel.isOpen()) {
             throw new IllegalStateException("Channel closed while reading or writing.");
         }
     }
 
     @Override public void close() throws IOException {
-        channel.close();
+        if (inputStream != null) inputStream.close();
+        else if (outputStream != null) outputStream.close();
+    }
+
+    public static FileObjectInjector fromFile(File file) throws IOException {
+        return fromFile(file, ObjectInjector.getDefaultInstance());
+    }
+
+    public static FileObjectInjector fromFile(File file, ObjectInjector objectInjector) throws IOException {
+        FileOutputStream stream = new FileOutputStream(file);
+        return new FileObjectInjector(objectInjector, stream);
+    }
+
+    public static <T> T readFileAsObject(Class<T> type, File file) throws IOException {
+        return readFileAsObject(type, file, ObjectInjector.getDefaultInstance());
+    }
+
+    public static <T> T readFileAsObject(Class<T> type, File file, ObjectInjector injector) throws IOException {
+        FileInputStream stream = null;
+        FileObjectInjector fileInjector = null;
+        try {
+            fileInjector = new FileObjectInjector(injector, stream = new FileInputStream(file));
+            return fileInjector.read(type).orElseThrow(() -> new IllegalStateException("Failed to find linker for class."));
+        } finally {
+            if (fileInjector != null) fileInjector.close();
+            else if (stream != null) stream.close();
+        }
     }
 }

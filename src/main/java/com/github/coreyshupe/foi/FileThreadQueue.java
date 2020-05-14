@@ -6,7 +6,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -22,7 +21,7 @@ public class FileThreadQueue extends Thread {
         instance.start();
     }
 
-    @NotNull protected final static Runnable EMPTY = () -> {
+    @NotNull public final static Runnable EMPTY = () -> {
     };
     @NotNull private final BlockingQueue<FileRequest> fileRequestQueue = new LinkedBlockingQueue<>();
 
@@ -31,14 +30,10 @@ public class FileThreadQueue extends Thread {
             try {
                 FileRequest request = fileRequestQueue.take();
                 if (request.debug) System.out.println("Starting write of: " + request.file.getAbsolutePath());
-                try (FileOutputStream stream = new FileOutputStream(request.file)) {
-                    try (FileObjectInjector injector = new FileObjectInjector(request.injector, stream.getChannel())) {
-                        if (request.debug) System.out.println("Writing: " + request.object);
-                        boolean result = injector.write(request.object);
-                        if (request.debug) System.out.println("Write result: " + result);
-                    } catch (IOException ex) {
-                        if (request.debug) ex.printStackTrace();
-                    }
+                try (FileObjectInjector injector = FileObjectInjector.fromFile(request.file, request.injector)) {
+                    if (request.debug) System.out.println("Writing: " + request.object);
+                    boolean result = injector.write(request.object);
+                    if (request.debug) System.out.println("Write result: " + result);
                 } catch (IOException ex) {
                     if (request.debug) ex.printStackTrace();
                 }
@@ -53,11 +48,34 @@ public class FileThreadQueue extends Thread {
         fileRequestQueue.add(request);
     }
 
-    @Builder public final static class FileRequest {
+    @Builder @Getter public final static class FileRequest {
         @NotNull private final File file;
-        @NotNull private final ChannelObjectInjector injector;
+        @Builder.Default @NotNull private final ObjectInjector injector = ObjectInjector.getDefaultInstance();
         @NotNull private final Object object;
-        @NotNull private final Runnable callback;
+        @Builder.Default @NotNull private final Runnable callback = EMPTY;
         @Builder.Default private final boolean debug = false;
+
+        public static FileRequest wrapCallback(final FileRequest fileRequest, final Runnable callback) {
+            if (fileRequest.callback == EMPTY) {
+                return FileRequest.builder()
+                        .file(fileRequest.file)
+                        .injector(fileRequest.injector)
+                        .object(fileRequest.object)
+                        .callback(callback)
+                        .debug(fileRequest.debug)
+                        .build();
+            } else {
+                return FileRequest.builder()
+                        .file(fileRequest.file)
+                        .injector(fileRequest.injector)
+                        .object(fileRequest.object)
+                        .callback(() -> {
+                            callback.run();
+                            fileRequest.callback.run();
+                        })
+                        .debug(fileRequest.debug)
+                        .build();
+            }
+        }
     }
 }

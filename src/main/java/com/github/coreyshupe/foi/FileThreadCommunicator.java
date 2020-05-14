@@ -11,52 +11,42 @@ public class FileThreadCommunicator {
     private final AtomicInteger inQueue;
     private boolean closed;
     private volatile boolean stalled;
+    private final Runnable innerCallback;
 
     public FileThreadCommunicator() {
         closed = false;
         inQueue = new AtomicInteger(0);
         stalled = false;
+        innerCallback = this::update;
         FileThreadQueue.startThread();
     }
 
-    public void queueRequest(@NotNull File file, @NotNull ChannelObjectInjector injector, @NotNull Object object) {
+    public void queueRequest(@NotNull File file, @NotNull Object object) {
         if (closed) return;
-        queueRequest(file, injector, object, EMPTY);
+        queueRequest(file, object, ObjectInjector.getDefaultInstance());
     }
 
-    public void queueRequest(@NotNull File file, @NotNull ChannelObjectInjector injector, @NotNull Object object, boolean debug) {
+    public void queueRequest(@NotNull File file, @NotNull Object object, @NotNull ObjectInjector injector) {
         if (closed) return;
-        queueRequest(file, injector, object, EMPTY, debug);
+        queueRequest(FileThreadQueue.FileRequest.builder()
+                .file(file)
+                .object(object)
+                .injector(injector)
+                .callback(EMPTY)
+                .build());
     }
 
-    public void queueRequest(@NotNull File file, @NotNull ChannelObjectInjector injector, @NotNull Object object, @NotNull Runnable callback) {
-        if (closed) return;
-        queueRequest(file, injector, object, callback, false);
-    }
-
-    public void queueRequest(@NotNull File file, @NotNull ChannelObjectInjector injector, @NotNull Object object, @NotNull Runnable callback, boolean debug) {
-        if (closed) return;
+    public void queueRequest(FileThreadQueue.FileRequest request) {
         inQueue.incrementAndGet();
-        FileThreadQueue.getInstance().queueRequest(
-                FileThreadQueue.FileRequest.builder()
-                        .file(file)
-                        .injector(injector)
-                        .object(object)
-                        .callback(wrapCallback(callback))
-                        .debug(debug)
-                        .build()
-        );
+        FileThreadQueue.getInstance().queueRequest(FileThreadQueue.FileRequest.wrapCallback(request, innerCallback));
     }
 
-    public Runnable wrapCallback(Runnable runnable) {
-        return () -> {
-            if (inQueue.decrementAndGet() == 0 && stalled) {
-                synchronized (FileThreadCommunicator.this) {
-                    notify();
-                }
+    private void update() {
+        if (inQueue.decrementAndGet() == 0 && stalled) {
+            synchronized (FileThreadCommunicator.this) {
+                notify();
             }
-            runnable.run();
-        };
+        }
     }
 
     public void close() {
