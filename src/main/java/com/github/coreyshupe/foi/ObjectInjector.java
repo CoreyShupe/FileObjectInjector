@@ -77,8 +77,8 @@ public class ObjectInjector {
                 if (buffer.capacity() >= size) {
                     if (buffer.position() != 0) {
                         buffer.flip();
-                        buffer.limit(size);
                     }
+                    buffer.limit(size);
                 } else {
                     buffer = ByteBuffer.allocate(size);
                 }

@@ -1,6 +1,7 @@
 package com.github.coreyshupe.foi.template.internal;
 
 import com.github.coreyshupe.foi.TemplateWalker;
+import com.github.coreyshupe.foi.template.SizedTemplate;
 import com.github.coreyshupe.foi.template.Template;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,12 +26,21 @@ public class CollectionTemplate<T> extends Template<Collection<T>> {
     }
 
     @Override public int sizeOf(@NotNull Collection<T> object) {
-        return object.stream().map(internalTemplate::sizeOf).reduce(0, Integer::sum) + Integer.BYTES;
+        if (internalTemplate instanceof SizedTemplate) {
+            return (((SizedTemplate<?>) internalTemplate).getSize() * object.size()) + Integer.BYTES;
+        }
+        int size = Integer.BYTES;
+        for (T t : object) {
+            size += internalTemplate.sizeOf(t);
+        }
+        return size;
     }
 
     @Override public void writeToBuffer(@NotNull Collection<T> object, @NotNull ByteBuffer buffer) {
         buffer.putInt(object.size());
-        object.forEach(t -> internalTemplate.writeToBuffer(t, buffer));
+        for (T t : object) {
+            internalTemplate.writeToBuffer(t, buffer);
+        }
     }
 
     @NotNull @Override public Collection<T> readFromWalker(@NotNull TemplateWalker walker) throws IOException {
