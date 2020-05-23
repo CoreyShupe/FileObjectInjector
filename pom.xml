@@ -40,6 +40,5 @@
 
     <build>
         <defaultGoal>clean package</defaultGoal>
-        <sourceDirectory>src/main/java</sourceDirectory>
     </build>
 </project>
