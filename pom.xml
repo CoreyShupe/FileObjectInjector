@@ -6,7 +6,6 @@
 
     <groupId>com.github.coreyshupe</groupId>
     <artifactId>foi</artifactId>
-    <packaging>jar</packaging>
     <version>0.1.5</version>
     <name>FileObjectInjector</name>
     <description>Library which allows you to create templates for and build objects into and from files.</description>
