@@ -1,5 +1,6 @@
 package com.github.coreyshupe.foi;
 
+import com.github.coreyshupe.foi.template.Template;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -109,5 +110,32 @@ public class FileThreadQueue extends Thread {
         @Override public boolean writeToInjector(@NotNull FileObjectInjector injector) throws IOException {
             return injector.writeCollection(type, object);
         }
+    }
+
+    @Builder @Getter public final static class CustomFileRequest<T> implements IFileRequest {
+        @NotNull private final Template<T> template;
+        @NotNull private final File file;
+        @Builder.Default @NotNull private final ObjectInjector injector = ObjectInjector.getDefaultInstance();
+        @NotNull private final T object;
+        @Builder.Default @NotNull private Runnable callback = EMPTY;
+        @Builder.Default private final boolean debug = false;
+
+        public void wrapCallback(@NotNull final Runnable callback) {
+            if (this.callback == EMPTY) {
+                this.callback = callback;
+            } else {
+                Runnable temp = this.callback;
+                this.callback = () -> {
+                    callback.run();
+                    temp.run();
+                };
+            }
+        }
+
+        @Override public boolean writeToInjector(@NotNull FileObjectInjector injector) throws IOException {
+            injector.write(template, object);
+            return true;
+        }
+
     }
 }
