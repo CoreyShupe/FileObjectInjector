@@ -10,8 +10,6 @@ import java.util.ArrayList;
 
 public class CharTemplate extends SizedTemplate<Character> {
     @Getter private final static CharTemplate instance = new CharTemplate();
-    @Getter
-    private final static CollectionTemplate<Character> collectionInstance = new CollectionTemplate<>(Character.class, instance, ArrayList::new);
 
     private CharTemplate() {
         super(Character.class, Character.BYTES);

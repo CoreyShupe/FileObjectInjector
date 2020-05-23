@@ -10,8 +10,6 @@ import java.util.UUID;
 
 public class UUIDTemplate extends SizedTemplate<UUID> {
     @Getter private final static UUIDTemplate instance = new UUIDTemplate();
-    @Getter
-    private final static CollectionTemplate<UUID> collectionInstance = new CollectionTemplate<>(UUID.class, instance, ArrayList::new);
 
     private UUIDTemplate() {
         super(UUID.class, Long.BYTES * 2);

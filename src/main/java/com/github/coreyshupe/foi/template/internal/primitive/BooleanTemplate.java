@@ -10,8 +10,6 @@ import java.util.ArrayList;
 
 public class BooleanTemplate extends SizedTemplate<Boolean> {
     @Getter private final static BooleanTemplate instance = new BooleanTemplate();
-    @Getter
-    private final static CollectionTemplate<Boolean> collectionInstance = new CollectionTemplate<>(Boolean.class, instance, ArrayList::new);
 
     public BooleanTemplate() {
         super(Boolean.class, Byte.SIZE);

@@ -37,15 +37,6 @@ public class ObjectInjector {
         this.templateLinker.addTemplate(StringTemplate.getInstance());
         this.templateLinker.addTemplate(UUIDTemplate.getInstance());
         // string & primitive collections
-        this.templateLinker.addCollectionTemplate(ByteTemplate.getCollectionInstance());
-        this.templateLinker.addCollectionTemplate(CharTemplate.getCollectionInstance());
-        this.templateLinker.addCollectionTemplate(DoubleTemplate.getCollectionInstance());
-        this.templateLinker.addCollectionTemplate(FloatTemplate.getCollectionInstance());
-        this.templateLinker.addCollectionTemplate(IntTemplate.getCollectionInstance());
-        this.templateLinker.addCollectionTemplate(LongTemplate.getCollectionInstance());
-        this.templateLinker.addCollectionTemplate(ShortTemplate.getCollectionInstance());
-        this.templateLinker.addCollectionTemplate(StringTemplate.getCollectionInstance());
-        this.templateLinker.addCollectionTemplate(UUIDTemplate.getCollectionInstance());
     }
 
     @NotNull
@@ -60,7 +51,7 @@ public class ObjectInjector {
 
     @NotNull
     public <T> Optional<Collection<T>> readCollection(@NotNull ReadableByteChannel channel, @NotNull Class<T> clazz) throws IOException {
-        Optional<CollectionTemplate<T>> optionalTemplate = templateLinker.getCollectionTemplate(clazz);
+        Optional<CollectionTemplate<T, ? extends Collection<T>>> optionalTemplate = templateLinker.getCollectionTemplate(clazz);
         if (optionalTemplate.isPresent()) {
             return Optional.of(readObject(channel, optionalTemplate.get()));
         } else {
@@ -112,9 +103,13 @@ public class ObjectInjector {
     }
 
     public <T> boolean writeCollection(@NotNull WritableByteChannel channel, @NotNull Class<T> clazz, @NotNull Collection<T> collection) throws IOException {
-        Optional<CollectionTemplate<T>> optionalTemplate = templateLinker.getCollectionTemplate(clazz);
+        Optional<CollectionTemplate<T, ? extends Collection<T>>> optionalTemplate = templateLinker.getCollectionTemplate(clazz);
         if (optionalTemplate.isPresent()) {
-            writeObject(channel, optionalTemplate.get(), collection);
+            CollectionTemplate<T, ? extends Collection<T>> template = optionalTemplate.get();
+            ByteBuffer buffer = ByteBuffer.allocate(template.sizeOfPrim(collection));
+            template.writeToBufferPrim(collection, buffer);
+            buffer.flip();
+            channel.write(buffer);
             return true;
         } else {
             return false;

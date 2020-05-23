@@ -10,8 +10,6 @@ import java.util.ArrayList;
 
 public class FloatTemplate extends SizedTemplate<Float> {
     @Getter private final static FloatTemplate instance = new FloatTemplate();
-    @Getter
-    private final static CollectionTemplate<Float> collectionInstance = new CollectionTemplate<>(Float.class, instance, ArrayList::new);
 
     private FloatTemplate() {
         super(Float.class, Float.BYTES);

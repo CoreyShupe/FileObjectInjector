@@ -10,8 +10,6 @@ import java.util.ArrayList;
 
 public class LongTemplate extends SizedTemplate<Long> {
     @Getter private final static LongTemplate instance = new LongTemplate();
-    @Getter
-    private final static CollectionTemplate<Long> collectionInstance = new CollectionTemplate<>(Long.class, instance, ArrayList::new);
 
     private LongTemplate() {
         super(Long.class, Long.BYTES);

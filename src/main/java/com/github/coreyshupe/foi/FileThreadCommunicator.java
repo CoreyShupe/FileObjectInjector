@@ -3,6 +3,7 @@ package com.github.coreyshupe.foi;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.coreyshupe.foi.FileThreadQueue.EMPTY;
@@ -36,9 +37,26 @@ import static com.github.coreyshupe.foi.FileThreadQueue.EMPTY;
                 .build());
     }
 
-    public void queueRequest(FileThreadQueue.FileRequest request) {
+    public <T> void queueRequest(@NotNull Class<T> type, @NotNull File file, @NotNull Collection<T> object) {
+        if (closed) return;
+        queueRequest(file, object, ObjectInjector.getDefaultInstance());
+    }
+
+    public <T> void queueRequest(@NotNull Class<T> type, @NotNull File file, @NotNull Collection<T> object, @NotNull ObjectInjector injector) {
+        if (closed) return;
+        queueRequest(FileThreadQueue.CollectionFileRequest.<T>builder()
+                .type(type)
+                .file(file)
+                .object(object)
+                .injector(injector)
+                .callback(EMPTY)
+                .build());
+    }
+
+    public void queueRequest(FileThreadQueue.IFileRequest request) {
         inQueue.incrementAndGet();
-        FileThreadQueue.getInstance().queueRequest(FileThreadQueue.FileRequest.wrapCallback(request, innerCallback));
+        request.wrapCallback(innerCallback);
+        FileThreadQueue.getInstance().queueRequest(request);
     }
 
     private void update() {
@@ -63,14 +81,11 @@ import static com.github.coreyshupe.foi.FileThreadQueue.EMPTY;
             return;
         }
         stalled = true;
-        while (true) {
-            synchronized (this) {
-                try {
-                    wait();
-                    return;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        synchronized (this) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

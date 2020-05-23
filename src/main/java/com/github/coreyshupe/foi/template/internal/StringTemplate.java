@@ -11,8 +11,6 @@ import java.util.ArrayList;
 
 public class StringTemplate extends ExactTemplate<String> {
     @Getter private final static StringTemplate instance = new StringTemplate();
-    @Getter
-    private final static CollectionTemplate<String> collectionInstance = new CollectionTemplate<>(String.class, instance, ArrayList::new);
 
     private StringTemplate() {
         super(String.class);

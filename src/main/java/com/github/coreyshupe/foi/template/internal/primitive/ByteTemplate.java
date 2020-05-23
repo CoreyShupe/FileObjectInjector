@@ -10,8 +10,6 @@ import java.util.ArrayList;
 
 public class ByteTemplate extends SizedTemplate<Byte> {
     @Getter private final static ByteTemplate instance = new ByteTemplate();
-    @Getter
-    private final static CollectionTemplate<Byte> collectionInstance = new CollectionTemplate<>(Byte.class, instance, ArrayList::new);
 
     private ByteTemplate() {
         super(Byte.class, Byte.BYTES);

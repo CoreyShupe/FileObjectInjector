@@ -244,4 +244,16 @@ import java.util.UUID;
             else if (stream != null) stream.close();
         }
     }
+
+    public static <T> T readFileAsObject(Template<T> template, File file, ObjectInjector injector) throws IOException {
+        FileInputStream stream = null;
+        FileObjectInjector fileInjector = null;
+        try {
+            fileInjector = new FileObjectInjector(injector, stream = new FileInputStream(file));
+            return fileInjector.read(template);
+        } finally {
+            if (fileInjector != null) fileInjector.close();
+            else if (stream != null) stream.close();
+        }
+    }
 }

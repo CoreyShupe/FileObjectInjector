@@ -44,12 +44,13 @@ import java.util.*;
         return addTemplate0(templates, template);
     }
 
-    @NotNull public <T> Optional<CollectionTemplate<T>> getCollectionTemplate(@NotNull Class<T> type) {
+    @NotNull
+    public <T> Optional<CollectionTemplate<T, ? extends Collection<T>>> getCollectionTemplate(@NotNull Class<T> type) {
         //noinspection unchecked
-        return getTemplate0(collectionTemplates, type).map(template -> (CollectionTemplate<T>) template);
+        return getTemplate0(collectionTemplates, type).map(template -> (CollectionTemplate<T, ? extends Collection<T>>) template);
     }
 
-    public boolean addCollectionTemplate(@NotNull CollectionTemplate<?> template) {
+    public boolean addCollectionTemplate(@NotNull CollectionTemplate<?, ?> template) {
         return addTemplate0(collectionTemplates, template);
     }
 
