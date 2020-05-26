@@ -40,7 +40,7 @@ import java.util.function.Supplier;
         }
     }
 
-    private <X, Y extends Collection<X>> void addCollection(
+    public <X, Y extends Collection<X>> void addCollection(
             @NotNull Class<X> type,
             @NotNull Function<T, Y> getter,
             @NotNull Supplier<Y> collectionSupplier
